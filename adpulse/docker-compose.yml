@@ -1,0 +1,70 @@
+version: '3.9'
+
+services:
+  postgres:
+    image: postgres:16-alpine
+    container_name: adpulse-postgres
+    environment:
+      POSTGRES_DB: adpulse
+      POSTGRES_USER: adpulse_user
+      POSTGRES_PASSWORD: adpulse_secret
+    ports:
+      - '5432:5432'
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ['CMD-SHELL', 'pg_isready -U adpulse_user -d adpulse']
+      interval: 5s
+      timeout: 5s
+      retries: 10
+
+  redis:
+    image: redis:7-alpine
+    container_name: adpulse-redis
+    ports:
+      - '6379:6379'
+    healthcheck:
+      test: ['CMD', 'redis-cli', 'ping']
+      interval: 5s
+      timeout: 3s
+      retries: 10
+
+  backend:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile
+    container_name: adpulse-backend
+    env_file: ./backend/.env
+    environment:
+      NODE_ENV: development
+      POSTGRES_HOST: postgres
+      REDIS_HOST: redis
+      FRONTEND_URL: http://localhost:3000
+    ports:
+      - '4000:4000'
+    depends_on:
+      postgres:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+    volumes:
+      - ./backend/src:/app/src
+    command: >
+      sh -c "npm run seed && npm run dev"
+
+  frontend:
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile
+    container_name: adpulse-frontend
+    environment:
+      REACT_APP_API_URL: http://localhost:4000/api
+    ports:
+      - '3000:3000'
+    depends_on:
+      - backend
+    volumes:
+      - ./frontend/src:/app/src
+
+volumes:
+  postgres_data:
