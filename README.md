@@ -101,8 +101,8 @@ The `GET /analytics/summary` endpoint aggregates across potentially thousands of
 ### One-command startup
 
 ```bash
-git clone https://github.com/YOUR_USERNAME/adpulse.git
-cd adpulse
+git clone https://github.com/paritheplatypus/AdPulse.git
+cd AdPulse
 docker compose up --build
 ```
 
@@ -128,7 +128,7 @@ npm test
 ## Project Structure
 
 ```
-adpulse/
+AdPulse/
 ├── backend/
 │   ├── src/
 │   │   ├── db/
