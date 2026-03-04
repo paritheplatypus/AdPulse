@@ -17,35 +17,7 @@ This isn't just a UX problem — it's a business problem. A user who quits a ses
 ## Architecture Overview
 
 ```
-┌─────────────────────────────────────────────────────────────┐
-│                        CLIENT                               │
-│   React SPA (Dashboard · Simulator · Inventory)             │
-└──────────────────────┬──────────────────────────────────────┘
-                       │ HTTP / REST
-┌──────────────────────▼──────────────────────────────────────┐
-│                   NODE.JS / EXPRESS                         │
-│                                                             │
-│  /api/auth       JWT token generation                       │
-│  /api/ads        Ad inventory CRUD                          │
-│  /api/sessions   Session lifecycle + next-ad serving  ◄─────┤── Core
-│  /api/analytics  Aggregated metrics + diversity scores      │
-│                                                             │
-│  ┌──────────────────────────────────────────────────────┐   │
-│  │           Ad Selection Algorithm                     │   │
-│  │  Hard constraints → Soft scoring → Weighted random   │   │
-│  └──────────────────────────────────────────────────────┘   │
-└─────────┬─────────────────────────┬───────────────────────--┘
-          │                         │
-┌─────────▼──────────┐   ┌──────────▼────────────────────────┐
-│      REDIS         │   │          POSTGRESQL                │
-│                    │   │                                    │
-│  Session history   │   │  ads          (inventory)          │
-│  Frequency counters│   │  sessions     (lifecycle)          │
-│  Live viewer count │   │  impressions  (audit log)          │
-│  Analytics cache   │   │                                    │
-│  TTL: 1hr sessions │   │  Indexes on session_id,            │
-│                    │   │  ad_id, served_at                  │
-└────────────────────┘   └────────────────────────────────────┘
+![AdPulse Architecture](AdPulseArchitecture "AdPulse Architecture")
 ```
 
 All services are containerized and orchestrated with **Docker Compose**.
