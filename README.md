@@ -16,9 +16,7 @@ This isn't just a UX problem — it's a business problem. A user who quits a ses
 
 ## Architecture Overview
 
-```
 ![AdPulse Architecture](AdPulseArchitecture "AdPulse Architecture")
-```
 
 All services are containerized and orchestrated with **Docker Compose**.
 
